@@ -40,3 +40,57 @@ end
 -- sort accesses the parameter grades, which is local
 -- to the enclosing function
 
+function newCounter() -- consider this function
+  local i = 0
+  return function()
+           i = i + 1
+           return i
+         end
+end
+
+c1 = newCounter()
+print(c1()) -- 1
+print(c1()) -- 2
+
+-- Put simply, a closure is a function plus all it needs to access
+-- non-local variables correctly
+c2 = newCounter()
+print(c2()) -- 1
+print(c1()) -- 3
+print(c2()) -- 2
+print(string.rep("*", 30))
+print("")
+
+-- non global functions
+-- we can store functions in table fields and in local variables
+Lib = {}
+Lib.foo = function(x, y) return x + y end
+Lib.goo = function(x, y) return x - y end
+
+-- we could also do the same thing like...
+Lib = {
+  foo = function(x, y) return x + y end,
+  goo = function(x, y) return x - y end
+}
+
+-- but there is a third syntax that Lua provides
+Lib = {}
+--function Lib.foo = function(x, y) return x + y end
+--function Lib.goo = function(x, y) return x - y end
+
+-- there is a subtle point that arises in the definition of recursive
+-- local functions. Better to write as
+local fact
+fact = function(n)
+  if n == 0 then 
+    return 1
+  else
+    return n*fact(n-1)
+  end
+end
+print(fact(3)) -- 6
+
+-- proper tail calls
+-- a tail call is a goto dressed as a call.
+-- a tail call happens when a function calls another 
+-- as its last action, so it has nothing else to do.
