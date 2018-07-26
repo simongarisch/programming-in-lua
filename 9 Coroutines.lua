@@ -50,3 +50,51 @@ co = coroutine.create(function(a, b)
   coroutine.yield(a+b, a-b)
 end)
 print(coroutine.resume(co, 20, 10)) -- true 30  10 ... on pg 94
+
+-- Lua offers asymmetric coroutines
+
+-- 9.2 Pipes and Filters: the producer - consumer problem
+function receive(prod)
+  local status, value = coroutine.resume(prod)
+  return value
+end
+
+function send(x)
+  coroutine.yield(x)
+end
+
+function producer()
+  return coroutine.create(
+    function()
+      t = {"a", "b", "c"}
+      for i=1, #t do
+        send(t[i])
+      end
+    end
+  )
+end
+
+function filter(prod)
+  return coroutine.create(
+    function ()
+      local x = receive(prod) -- get new value
+      send(x) -- send it to the consumer
+    end
+  )
+end
+
+function consumer(prod)
+  local x = receive(prod)
+  print(x)
+end
+
+-- we can extend the design with filters, which are tasks that
+-- sit between the producer and the consumer doing some kind of 
+-- transformation in the data
+p = producer()
+print(p) -- thread: 00000000224ED900
+print(coroutine.status(p)) -- suspended
+f = filter(p)
+consumer(p) -- 'a' so we get the first letter
+
+print(coroutine.status(p)) -- suspended
