@@ -174,3 +174,69 @@ E: errorfree, value, status true  5 suspended
 B: odd  5
 E: errorfree, value, status true  nil dead
 ]]
+
+-- coroutines as iterators
+-- we can see loop iterators as a particular example of the 
+-- producer-consumer pattern: an iterator produces items to
+-- be consumed by the loop body
+
+-- an iterator to traverse all permutations of an array
+function print_one_result(a)
+  for i=1, #a do
+    io.write(a[i], " ")    
+  end
+  io.write("\n")
+end
+print("With the print_one_result function...")
+print_one_result{"d", "e", "f"} -- d e f 
+print(string.rep("*", 30))
+print("\n")
+
+function permgen(a, n)
+  n = n or #a
+  if n <= 1 then
+    --print_one_result(a)    
+    coroutine.yield(a)
+  else
+    for i=1,n do
+      -- put the i-th element as the last one
+      a[n], a[i] = a[i], a[n]
+      -- generate all permutations of the other elements
+      permgen(a, n-1)
+      -- restore the i-th element
+      a[n], a[i] = a[i], a[n]
+    end
+  end
+end
+--[[
+print("And running permgen with print...")
+permgen{1, 2, 3, 4}
+print(string.rep("*", 30))
+print("\n")
+-- b c a 
+-- c b a 
+-- c a b 
+-- a c b 
+-- b a c 
+-- a b c 
+]]
+
+function permutations(a)
+  local co = coroutine.create(function () permgen(a) end)
+  return function () -- iterator
+    local code, res = coroutine.resume(co)
+    return res  
+  end
+end
+
+for p in permutations{"a", "b", "c"} do -- using our iterator
+  print_one_result(p)
+end
+-- same print as before...
+
+-- non-preemptive multithreading
+-- while a coroutine is running it cannot be stopped from the outside
+-- It suspends operation only when it explicitly requests so 
+-- (through a call to yield). 
+-- however, whenever a blocking operation is called the whole program
+-- blocks until the operation completes.
