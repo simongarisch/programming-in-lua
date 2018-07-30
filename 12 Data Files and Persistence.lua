@@ -1,0 +1,2 @@
+-- when we write a file we have full control over what is going on
+-- When we read a file, on the other hand, we don't know what to expect
