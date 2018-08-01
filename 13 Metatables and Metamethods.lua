@@ -116,4 +116,40 @@ end
 -- now we are ready to use these
 s1 = Set.new{2, 4}
 s2 = Set.new{4, 10, 2}
-print()
+print(s1 <= s2) -- true
+print(s1 < s2)  -- true
+print(s1 >= s1) -- true
+print(s1 > s1)  -- false
+
+-- when formatting any value, tostring first checks whether the
+-- value has a __tostring metamethod.
+mt.__tostring = Set.tostring
+s1 = Set.new{10, 4, 5}
+print(s1) -- {5, 10, 4}
+
+-- table access metamethods
+-- define behavior for otherwise erroneous situations
+-- when we try to access an absent value from a table nil is returned
+-- first the interpreter looks for an __index metamethod; if there is
+-- no such method then the access results in nil.
+
+-- here is a window example
+Window = {}
+
+-- create the prototype with default values
+Window.prototype = {x=0, y=0, width=100, height=100}
+Window.mt = {} -- create a metatable
+
+-- declare the constructor function
+function Window.new(o)
+  setmetatable(o, Window.mt)
+  return o
+end
+
+Window.mt.__index = function(table, key)
+  return Window.prototype[key]
+end
+
+w = Window.new{x=10, y=20}
+print(w.width) -- 100
+
