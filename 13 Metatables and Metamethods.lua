@@ -152,4 +152,39 @@ end
 
 w = Window.new{x=10, y=20}
 print(w.width) -- 100
+print(string.rep("*", 30))
+--[[
+The use of the __index metamethod for inheritance is so common that Lua
+provides a shortcut. Despite the name, the __index metamethod does not need
+to be a function: it can be a table, instead. When it is a function, Lua calls it with
+the table and the absent key as its arguments, as we have just seen. When it is
+a table, Lua redoes the access in this table.
+]]
 
+function setDefault(t, d)
+  local mt = {__index = function () return d end}
+  setmetatable(t, mt)
+end
+
+tab = {x=10, y=20}
+print(tab.x, tab.y) -- 10, nil
+setDefault(tab, 0)
+print(tab.x, tab.z)
+
+-- read only tables
+-- raise an error whenever we track any attempt to update the table
+function readOnly(t)
+  local proxy = {}
+  local mt = {
+    __index = t,
+    __newindex = function(t, k, v)
+      error("attempt to update a read-only table", 2)
+    end
+  }
+  setmetatable(proxy, mt)
+  return proxy
+end
+
+local tbl = readOnly{"a", "b", "c"}
+print(tbl[1]) -- a
+tbl[1] = "Not going to fly" -- error: attempt to update a read-only table
