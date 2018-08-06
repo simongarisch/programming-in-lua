@@ -74,6 +74,10 @@ setmetatable(_G, {
   end,
 })
 
+-- You can change the environment of a function with 
+-- the setfenv function
+print(string.rep("*", 30))
+print(_G.setfenv)
 a = 1
 setfenv(1, {g = _G})
 g.print(a)
