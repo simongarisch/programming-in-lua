@@ -77,3 +77,35 @@ add function: 0000000021FCD310
 -- submodules and packages
 -- lua allows module names to be hierarchial, using
 -- a dot to separate name levels.
+
+print(string.rep("*", 30))
+print("Now with parent and sub packages...")
+print(require) -- function: 0000000023129980
+-- notice that require is not available automatically in the parent
+-- module as it's part of the global scope _G which has not been
+-- exposed
+local p = require "parent_module"
+print(p) -- table: 000000002357CB50
+
+print(string.rep("*", 30))
+for k,v in pairs(p) do
+  print(k,v)
+end
+-- notice that sm1 and sm2 are not local
+--[[
+sm1 table: 0000000018F8CFB0
+_NAME parent_module
+_PACKAGE  
+parent_func2  function: 0000000018F8F280
+_M  table: 0000000018F8CD80
+parent_func1  function: 0000000018F8F250
+sm2 table: 0000000018F8D190
+]]
+
+p.sm1.sub_module_1_func1()
+-- Hello from sub_module_1_func1!
+
+-- so this works nicely
+-- one thing to check is requiring only specific 
+-- global functions, not everything from the global table _G
+-- some reading: http://lua-users.org/wiki/LuaModuleFunctionCritiqued
