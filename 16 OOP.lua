@@ -115,8 +115,97 @@ print(s.balance) -- -300
 print(string.rep("*", 30))
 
 -- multiple inheritance
+-- here is an alternative implementation that allows for 
+-- multiple inheritance in Lua
+Named = {}
+function Named:getname()
+  return self.name
+end
 
+function Named:setname(n)
+  self.name = n
+end
 
+-- look up for k in list of tables 'plist'
+local function search(k, plist)
+  for i=1,#plist do
+    local v = plist[i][k] -- try i-th superclass
+    if v then return v end
+  end
+end
 
+function createClass(...)
+  local c = {}
+  local parents = {...}
+  
+  -- class will search for each method in the list of
+  -- its parents
+  setmetatable(c, {
+    __index = function(t, k)
+      return search(k, parents)
+    end
+  })
+  
+  -- prepare c to be the metatable of this instance
+  c.__index = c
+  
+  -- define a new constructor for this class
+  function c:new(o)
+    o = o or {}
+    setmetatable(o, c)
+    return o
+  end
+  
+  return c -- return the new class
+end
 
+-- we can then create a class called NamedAccount that is
+-- a subclass of both Account and Named...
+NamedAccount = createClass(Account, Named)
+account = NamedAccount:new{name="Paul"}
+print(account:getname()) -- Paul
+print(account.balance)   -- 0
+account:deposit(100)
+account:withdraw(50)
+print(account.balance)   -- 50
+print(string.rep("*", 30))
+-- there are also ways to make the inherited method lookup
+-- faster (by storing lookup results)
 
+-- privacy
+-- the basic idea of this alternative design is to represent
+-- each object through two tables: one for its state and
+-- another for its operations (or interface)
+-- representing a bank account with this design
+function newAccount(initialBalance)
+  local self = {balance = initialBalance}
+  local withdraw = function (v)
+                     self.balance = self.balance - v
+                   end
+  local deposit = function (v)
+                    self.balance = self.balance + v
+                  end
+  local getBalance = function () return self.balance end
+  return{
+    withdraw = withdraw,
+    deposit = deposit,
+    getBalance = getBalance
+  }
+end
+
+account = newAccount(100)
+account.deposit(100)
+account.withdraw(50)
+print(account.getBalance()) -- 150
+print(string.rep("*", 30))
+print("")
+
+-- first the function creates a table to keep the internal
+-- object state and stores it in the local variable self
+-- then, the function creates methods for this object
+-- finally, mapped method names are returned
+-- this gives full privacy to everything stored in the 
+-- self table.
+
+-- the single method approach
+-- use a get and set example... pretty straightforward

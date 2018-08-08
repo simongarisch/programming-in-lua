@@ -1,0 +1,4 @@
+-- Lua does automatic memory management (through garbage collection)
+-- there are no problems with cyclic data structures
+-- any object stored in a global variable is not garbage for Lua
+-- it is up to you to assign nil to these
