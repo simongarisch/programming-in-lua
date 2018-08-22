@@ -17,7 +17,7 @@ int main (void) {
   ptr_w = &w;
   ptr_h = &h;
 
-  const char *fname = "lua_config.lua";
+  const char *fname = "config.lua";
   load(L, fname, ptr_w, ptr_h);
   lua_close(L);
   printf("width is %d, height is %d\n", w, h);
