@@ -3,6 +3,8 @@ http://www.troubleshooters.com/codecorn/lua/lua_c_calls_lua.htm
 You'll need to install cygwin and the lua dependencies lua-devel
 http://cygwin.com/cygwin-ug-net/cygcheck.html
 
+For a list of what we need
+https://www.safaribooksonline.com/library/view/creating-solid-apis/9781491986301/ch01.html
 
 C:\\cygwin64\\bin\\gcc -o basic basic.c -llua
 */

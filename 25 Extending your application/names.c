@@ -11,7 +11,7 @@ int main (void) {
   luaL_openlibs(L);               /* opens the standard libraries */
  
 
-  const char *fname = "config.lua";
+  //const char *fname = "config.lua";
   lua_close(L);
   puts("TESTING 123...")
   return 0;
