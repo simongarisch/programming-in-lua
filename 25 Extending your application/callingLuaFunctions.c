@@ -45,6 +45,10 @@ double f(lua_State *L, double x, double y){
   lua_pushnumber(L, y);  // push second argument
   
   // do the call: 2 arguments, 1 result
+  // You call lua_pcall with the number of arguments
+  // you are passing and the number of results you want.
+  // The fourth argument indicates an error-handling function
+  // A zero means no error handling function
   if(lua_pcall(L,2,1,0) != 0){
     error(L, "error running function 'f': %s",
 			 lua_tostring(L,-1));
